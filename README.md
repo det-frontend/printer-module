@@ -1,21 +1,19 @@
-### Installation (pm2 recommended)
+### Installation (one command)
 
-Cross-platform process manager with auto-restart and optional boot startup.
+Use the bundled setup script to install pm2, ensure serial permissions, start the bridge, and enable pm2 on boot.
 
 ```bash
-# Install pm2 globally
-npm i -g pm2
-
-# Start with environment variables
-pm2 start printer.js --name printer-bridge --env production -- \
-  SERIAL_PATH=/dev/ttyUSB0 BAUD=9600 PORT=8081
-
-# Persist the current process list
-pm2 save
-
-# Enable pm2 to start on boot (follow the printed instructions)
-pm2 startup
+cd /your-codebase-path/printer-bridge
+chmod +x setup.sh
+SERIAL_PATH=/dev/ttyUSB0 BAUD=9600 PORT=8081 ./setup.sh
 ```
+
+Notes:
+- Starts without auth (open API). Change `PORT`, `SERIAL_PATH`, `BAUD` as needed.
+- If you are newly added to the `dialout` group, log out and back in for it to take effect.
+- Verify running status:
+  - `curl -s http://localhost:8081/health`
+  - `pm2 logs printer-bridge`
 
 Linux serial permissions for `/dev/ttyUSB0` (permanent):
 
@@ -47,7 +45,7 @@ That is enough on most Linux distros. No need to run `sudo chmod` each time.
 - **POLL_MS**: Poll interval for auto-open in ms (default `3000`)
 - **ALLOWED_ORIGINS**: CORS origins, comma-separated, `*` for all (default `*`)
 
-### Quick start
+### Quick start (manual run)
 
 ```bash
 cd /your-codebase-path/printer-bridge
