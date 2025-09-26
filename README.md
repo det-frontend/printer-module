@@ -34,7 +34,7 @@ That is enough on most Linux distros. No need to run `sudo chmod` each time.
 
 ### Printer Bridge API
 
-- **Base URL**: `http://<host>:<port>` (default `http://localhost:8081`)
+- **Base URL**: `http://<host>:<port>` (default `http://192.168.0.100:8081`)
 - **Content types**:
   - JSON: `application/json`
   - Binary: `application/octet-stream`
@@ -165,24 +165,24 @@ curl -s http://localhost:8081/health
 
 - Open port:
 ```bash
-curl -s -H 'x-bridge-secret: mysecret' -H 'Content-Type: application/json' \
+curl -s -H -H 'Content-Type: application/json' \
   -d '{"path":"/dev/ttyUSB0","baud":9600}' http://localhost:8081/open
 ```
 
 - Write hex:
 ```bash
-curl -s -H 'x-bridge-secret: mysecret' -H 'Content-Type: application/json' \
+curl -s -H -H 'Content-Type: application/json' \
   -d '{"hex":"1B401B610148454C4C4F0A"}' http://localhost:8081/write-hex
 ```
 
 - Print voucher (defaults):
 ```bash
-curl -s -H 'x-bridge-secret: mysecret' -X POST http://localhost:8081/print-voucher
+curl -s -H -X POST http://localhost:8081/print-voucher
 ```
 
 - Print voucher (custom):
 ```bash
-curl -s -H 'x-bridge-secret: mysecret' -H 'Content-Type: application/json' \
+curl -s -H -H 'Content-Type: application/json' \
   -d '{
     "station":{"name":"Fuel Station A","address":"42 Street","city":"Yangon","state":"MM","phone1":"09-111111111","phone2":"09-222222222"},
     "voucher":{"dailyReportDate":"Fri Sep 26 2025","createAt":"2025-09-26T14:23:45.000Z","nozzleNo":"03","vocono":"VC987654","salePrice":"2530","saleLiter":"5.25","totalPrice":"13282.5","fuelType":"DIESEL"}
@@ -192,7 +192,7 @@ curl -s -H 'x-bridge-secret: mysecret' -H 'Content-Type: application/json' \
 
 - Close port:
 ```bash
-curl -s -H 'x-bridge-secret: mysecret' -X POST http://localhost:8081/close
+curl -s -H -X POST http://localhost:8081/close
 ```
 
 
