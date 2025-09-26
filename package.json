@@ -1,0 +1,19 @@
+{
+  "name": "printer-bridge",
+  "version": "1.0.0",
+  "main": "printer.js",
+  "scripts": {
+    "start": "node printer.js",
+    "list-ports": "node list-ports.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "morgan": "^1.10.1",
+    "serialport": "^13.0.0"
+  }
+}

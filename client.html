@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"/><title>Printer Client</title></head>
+<body>
+  <h3>Printer Bridge Client</h3>
+  <label>Bridge URL: <input id="url" value="http://localhost:8081" style="width:360px"/></label><br/>
+  <label>Secret: <input id="secret" value="mysecret" /></label><br/>
+  <label>Hex: <input id="hex" value="1B401B610148454C4C4F0A" style="width:360px"/></label><br/>
+  <button id="send">Send Hex</button>
+  <button id="health">Health</button>
+  <hr/>
+  <h4>/print-voucher test</h4>
+  <div style="margin:6px 0">
+    <button id="print-default">Print with defaults</button>
+    <button id="print-sample">Print with sample data</button>
+  </div>
+  <div>
+    <div>Custom JSON body:</div>
+    <textarea id="voucher-json" style="width: 520px; height: 180px; white-space: pre;">
+{
+  "station": {
+    "name": "Fuel Station A",
+    "address": "42 Street",
+    "city": "Yangon",
+    "state": "MM",
+    "phone1": "09-111111111",
+    "phone2": "09-222222222"
+  },
+  "voucher": {
+    "dailyReportDate": "Fri Sep 26 2025",
+    "createAt": "2025-09-26T14:23:45.000Z",
+    "nozzleNo": "03",
+    "vocono": "VC987654",
+    "salePrice": "2530",
+    "saleLiter": "5.25",
+    "totalPrice": "13282.5",
+    "fuelType": "DIESEL"
+  }
+}
+    </textarea><br/>
+    <button id="print-custom">Print with custom JSON</button>
+  </div>
+  <pre id="log"></pre>
+<script>
+const logEl = document.getElementById('log');
+const log = (s)=>{ logEl.textContent += s + '\n'; logEl.scrollTop = logEl.scrollHeight; };
+
+document.getElementById('send').addEventListener('click', async () => {
+  const url = document.getElementById('url').value.replace(/\/$/, '');
+  const secret = document.getElementById('secret').value;
+  const hex = document.getElementById('hex').value.trim();
+  try {
+    const resp = await fetch(url + '/write-hex', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'x-bridge-secret': secret },
+      body: JSON.stringify({ hex })
+    });
+    const j = await resp.json();
+    log('send response: ' + JSON.stringify(j));
+  } catch (err) {
+    log('send error: ' + err);
+  }
+});
+
+document.getElementById('health').addEventListener('click', async () => {
+  const url = document.getElementById('url').value.replace(/\/$/, '');
+  try {
+    const r = await fetch(url + '/health');
+    const j = await r.json();
+    log('health: ' + JSON.stringify(j));
+  } catch (err) { log('health error: ' + err); }
+});
+
+async function postPrintVoucher(urlBase, secret, body) {
+  try {
+    const r = await fetch(urlBase + '/print-voucher', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-bridge-secret': secret
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    const ctype = r.headers.get('content-type') || '';
+    if (ctype.includes('application/json')) {
+      const j = await r.json();
+      log('print-voucher [' + r.status + ']: ' + JSON.stringify(j));
+    } else {
+      const t = await r.text();
+      log('print-voucher [' + r.status + ' text]: ' + t.slice(0, 500));
+    }
+  } catch (err) {
+    log('print-voucher error: ' + err);
+  }
+}
+
+document.getElementById('print-default').addEventListener('click', async () => {
+  const url = document.getElementById('url').value.replace(/\/$/, '');
+  const secret = document.getElementById('secret').value;
+  postPrintVoucher(url, secret, null);
+});
+
+document.getElementById('print-sample').addEventListener('click', async () => {
+  const url = document.getElementById('url').value.replace(/\/$/, '');
+  const secret = document.getElementById('secret').value;
+  const sample = {
+    station: {
+      name: 'Fuel Station A',
+      address: '42 Street',
+      city: 'Yangon',
+      state: 'MM',
+      phone1: '09-111111111',
+      phone2: '09-222222222'
+    },
+    voucher: {
+      dailyReportDate: 'Fri Sep 26 2025',
+      createAt: '2025-09-26T14:23:45.000Z',
+      nozzleNo: '03',
+      vocono: 'VC987654',
+      salePrice: '2530',
+      saleLiter: '5.25',
+      totalPrice: '13282.5',
+      fuelType: 'DIESEL'
+    }
+  };
+  postPrintVoucher(url, secret, sample);
+});
+
+document.getElementById('print-custom').addEventListener('click', async () => {
+  const url = document.getElementById('url').value.replace(/\/$/, '');
+  const secret = document.getElementById('secret').value;
+  const txt = document.getElementById('voucher-json').value;
+  try {
+    const body = JSON.parse(txt);
+    postPrintVoucher(url, secret, body);
+  } catch (e) {
+    log('Invalid JSON: ' + e);
+  }
+});
+</script>
+</body>
+</html>
