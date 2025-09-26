@@ -124,7 +124,7 @@ curl -s http://localhost:8081/health
   - 400/503 on error
 
 #### POST `/print-voucher`
-- **Description**: Build and print an ESC/POS voucher using the same layout as `index.tsx`. Converts ASCII fields to hex and prints the receipt.
+- **Description**: Build and print an ESC/POS voucher. Converts ASCII fields to hex and prints the receipt.
 - **Body (json)**: All fields optional; defaults used when missing.
 ```json
 {
